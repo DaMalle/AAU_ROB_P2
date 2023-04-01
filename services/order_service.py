@@ -6,8 +6,10 @@ from pydantic import BaseModel
 class Order(BaseModel):
     top_color: str
     bottom_color: str
-    fuses: int
-    pcb_holes: int
+    top_fuse: bool
+    bottom_fuse: bool
+    top_hole: bool
+    bottom_hole: bool
 
 
 app = FastAPI()
