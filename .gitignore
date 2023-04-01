@@ -1,4 +1,5 @@
 __pycache__/
+mongodb-data/
 
 # Logs
 logs
