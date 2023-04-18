@@ -112,8 +112,8 @@ function App() {
           <button className={`w-[89%] h-0 rounded-lg flex justify-center items-center border border-slate-200 bg-white m-5 p-5 ${preview && "ring ring-inset ring-indigo-500"}`} onClick={() => setPreview(!preview)}>Toggle Preview</button>
           <ColorOption optionTitle={"Top Cover"} activeColor={topColor} setActiveColor={setTopColor} colorOptions={topColors}/>
           <ColorOption optionTitle={"Bottom Cover"} activeColor={bottomColor} setActiveColor={setBottomColor} colorOptions={bottomColors}/>
-          <AdditionalOptions optionTitle={"Fuses"} optionNames={"Fuse"} top={topFuse} setTop={setTopFuse} bottom={bottomFuse} setBottom={setBottomFuse} />
-          <AdditionalOptions optionTitle={"Holes"} optionNames={"Holes"} top={topHole} setTop={setTopHole} bottom={bottomHole} setBottom={setBottomHole} />
+          <AdditionalOptions optionTitle={"Fuse"} optionNames={"Fuse"} top={topFuse} setTop={setTopFuse} bottom={bottomFuse} setBottom={setBottomFuse} />
+          <AdditionalOptions optionTitle={"Hole"} optionNames={"Holes"} top={topHole} setTop={setTopHole} bottom={bottomHole} setBottom={setBottomHole} />
           <button className="w-[89%] rounded-lg border border-slate-200 bg-indigo-500 m-5 mt-0 p-5 text-white" onClick={sendOrder}>Send Order</button>
         </div>
       </div>
