@@ -76,8 +76,8 @@ if __name__ == "__main__":
     P5_x = T_05[0][3]
     phi1 = math.atan2(P5_y, P5_x)
     phi2 = np.arccos(d4 / math.sqrt(P5_x**2 + P5_y**2))
-    theta1 = phi1 + phi2 + math.pi / 2
-    # theta1 = phi1 - phi2 + math.pi / 2
+    # theta1 = phi1 + phi2 + math.pi / 2
+    theta1 = phi1 - phi2 + math.pi / 2
     print(f"Theta 1 is: {radiants_to_degrees(theta1):.3f}\n")
     theta5 = np.arccos(
         (P_06[0][0] * math.sin(theta1) - P_06[1][0] * math.cos(theta1)
@@ -90,17 +90,24 @@ if __name__ == "__main__":
     theta6 = math.atan2((-T_60[1][0] * math.sin(theta1) + T_60[1][1] * math.cos(theta1)) / math.sin(theta5), (T_60[0][0] * math.sin(theta1)-T_60[0][1] * math.cos(theta1)) / math.sin(theta5))
     print(f"Theta 6 is: {radiants_to_degrees(theta6):.3f}\n")
 
-    T_14 = T_12 @ T_23 @ T_34
+    # T_14 = T_12 @ T_23 @ T_34
+    T_01 = T_mdh(alpha1, a1, d1, theta1)
+    T_45 = T_mdh(alpha5, a5, d5, theta5)
+    T_56 = T_mdh(alpha6, a6, d6, theta6)
+    T_14 = inv(T_01) @ T_06 @ inv(T_56) @ inv(T_45)
 
     P_14_x = T_14[0][3]
     P_14_z = T_14[2][3]
-    theta3 = np.arccos((P_14_x**2 + P_14_z**2 - a3**2 - a4**2) / (2 * a3 * a4))
+    theta3 = math.acos((P_14_x**2 + P_14_z**2 - a3**2 - a4**2) / (2 * a3 * a4))
     # theta3 = -np.arccos((P_14_x**2 + P_14_z**2 - a3**2 - a4**2) / (2 * a3 * a4))
     print(f"Theta 3 is : {radiants_to_degrees(theta3):.3f}\n")
 
     theta2 = math.atan2(-P_14_z, -P_14_x) - math.asin((-a4 * math.sin(theta3) / math.sqrt(P_14_x**2 + P_14_z**2)))
     print(f"Theta 2 is: {radiants_to_degrees(theta2):.3f}\n")
 
+    T_12 = T_mdh(alpha2, a2, d2, theta2)
+    T_23 = T_mdh(alpha3, a3, d3, theta3)
+    T_34 = inv(T_12 @ T_23) @ T_14
     theta4 = math.atan2(T_34[1][0], T_34[0][0])
     print(f"Theta 4 is : {radiants_to_degrees(theta4):.3f}\n")
 
