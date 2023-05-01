@@ -70,14 +70,15 @@ if __name__ == "__main__":
         [T_06[1][3]],
         [T_06[2][3]]
     ])
-    T_05 = T_01 @ T_12 @ T_23 @ T_34 @ T_45
+    P_05 = T_06 @ np.array([0, 0, -d6, 1])
 
-    P5_y = T_05[1][3]
-    P5_x = T_05[0][3]
+    P5_y = P_05[1]
+    P5_x = P_05[0]
     phi1 = math.atan2(P5_y, P5_x)
     phi2 = np.arccos(d4 / math.sqrt(P5_x**2 + P5_y**2))
-    # theta1 = phi1 + phi2 + math.pi / 2
-    theta1 = phi1 - phi2 + math.pi / 2
+    theta1 = phi1 + phi2 + math.pi / 2
+    print(f"phi1 is: {phi1}, phi2 is: {phi2}")
+    #theta1 = phi1 - phi2 + math.pi / 2
     print(f"Theta 1 is: {radiants_to_degrees(theta1):.3f}\n")
     theta5 = np.arccos(
         (P_06[0][0] * math.sin(theta1) - P_06[1][0] * math.cos(theta1)
