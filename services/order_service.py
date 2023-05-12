@@ -97,6 +97,33 @@ def Check_stock(Top, Bottom) -> list[int]:
         print(resultBottom.registers[0])
         return [resultTop.registers[0], resultBottom.registers[0]]
 
+### -------- Functions for moving the UR5 -------- ###
+def Initialize_robot(linear_speed: int, joint_speed: int) -> None:
+    """Start the UR5 in mode: '6'. This will make it possible to move the real robot from the PC (PC is the client, the robot behaves like a server). \n 
+    Then sets linear speed and joint speed of the UR5.\n
+    Parameters: (linear_speed, joint_speed)"""
+    RDK.setRunMode(6)
+    robot.setSpeed(linear_speed)
+    robot.setSpeedJoints(joint_speed)
+
+def Move_home() -> None:
+    """Moves to starting position above assembly station.\n
+    Parameters: None"""
+    robot.MoveJ(RDK.Item("AboveAssemblyBottomCover"))
+
+def Grasp(width: int, speed: int) -> None:
+    """Uses grasp function from wsg50 library.\n
+    Parameters: (width: int, speed: int)"""
+    time.sleep(0.01)
+    wsg50_instance.grasp_part(width, speed)
+    time.sleep(0.01)
+
+def Release(width: int, speed: int):
+    """Uses release function from wsg50 library.\n
+    Parameters: (width: int, speed: int)"""
+    time.sleep(0.01)
+    wsg50_instance.release_part(width, speed)
+    time.sleep(0.01)
 
 def Bottom_pickup(Bottom: str) -> None:
     """Picks up the bottom cover, depending on the color input, cooming from the GUI.\n
@@ -120,75 +147,6 @@ def Bottom_pickup(Bottom: str) -> None:
             robot.MoveL(RDK.Item("Bottom Cover 2"))
             Grasp(68, gripSpeed)
             robot.MoveL(RDK.Item("Bottom Cover 1"))
-            
-
-def PCB_pickup() -> None:
-    """Picks up the PCB.\n
-    Parameters: None"""
-    robot.setPoseFrame(RDK.Item("FramePCB"))
-    robot.MoveL(RDK.Item("PCB 1"))
-    robot.MoveL(RDK.Item("PCB 2"))
-    Grasp(52, gripSpeed)
-    robot.MoveL(RDK.Item("PCB 1"))
-
-
-def Fuse_pickup(top_fuse: bool, bottom_fuse: bool) -> None:
-    """Picks up the the ordered amount of fuses depending on values top_fuse and bottom_fuse.\n
-    Parameters: (top_fuse: bool, bottom_fuse: bool)"""
-    robot.setPoseFrame(RDK.Item("Universal Frame"))
-    robot.MoveL(RDK.Item("BetweenFuseAndAssembly"))
-    if top_fuse and bottom_fuse: # Picks up both fuses
-        robot.setPoseFrame(RDK.Item("FrameFuse"))
-        robot.MoveL(RDK.Item("Top Fuse Approach & Exit"))
-        robot.setSpeed(200)
-        robot.MoveL(RDK.Item("Top Fuse"))
-        #pickup <----
-        robot.MoveL(RDK.Item("Top Fuse Approach & Exit"))
-        robot.MoveL(RDK.Item("Bottom Fuse Approach & Exit"))
-        robot.MoveL(RDK.Item("Bottom Fuse"))
-        #pickup <----
-        robot.MoveL(RDK.Item("Bottom Fuse Approach & Exit"))
-    elif top_fuse: # Picks up top fuse
-        robot.setPoseFrame(RDK.Item("FrameFuse"))
-        robot.MoveL(RDK.Item("Top Fuse Approach & Exit"))
-        robot.setSpeed(200)
-        robot.MoveL(RDK.Item("Top Fuse"))
-        #pickup <----
-        robot.MoveL(RDK.Item("Top Fuse Approach & Exit"))
-    elif bottom_fuse: # Picks up bottom fuse
-        robot.setPoseFrame(RDK.Item("FrameFuse"))
-        robot.MoveL(RDK.Item("Bottom Fuse Approach & Exit"))
-        robot.setSpeed(200)
-        robot.MoveL(RDK.Item("Bottom Fuse"))
-        #pickup <----
-        robot.MoveL(RDK.Item("Bottom Fuse Approach & Exit"))
-    robot.setSpeed(linear_speed)
-
-def Top_pickup(Top: str) -> None:
-    """Picks up the top cover, depending on the ordered color input in the GUI.\n
-    Parameters: (Top: str)"""
-    robot.setPoseFrame(RDK.Item("Universal frame"))
-    robot.MoveJ(RDK.Item("BetweenTopCoverAndAssembly"))
-    match Top:
-        case 'White':
-            robot.setPoseFrame(RDK.Item("Frame 8"))
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
-            robot.MoveL(RDK.Item("Bottom Cover 2"))
-            Grasp(68, gripSpeed)
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
-        case 'Blue':
-            robot.setPoseFrame(RDK.Item("Frame 7"))
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
-            robot.MoveL(RDK.Item("Bottom Cover 2"))
-            Grasp(68, gripSpeed)
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
-        case 'Black':
-            robot.setPoseFrame(RDK.Item("Frame 6"))
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
-            robot.MoveL(RDK.Item("Bottom Cover 2"))
-            Grasp(68, gripSpeed)
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
-
 
 def Hole_drill(top_holes: bool, bottom_holes: bool) -> int:
     """Drills the correct amount of holes in the bottom cover depended on values top_holes and bottom_holes\n
@@ -234,7 +192,6 @@ def Hole_drill(top_holes: bool, bottom_holes: bool) -> int:
         robot.MoveL(RDK.Item("BeforeDrilling180"))
         robot.MoveJ(RDK.Item("Approach_Exit_Drilling"))
         return 1           
-        
 
 def From_drill_to_assembly(Offset1: int) -> None:
     """Desides the path from drill to assembly in relation to offset1, if the bottom cover was offset when drilling holes in the bottom.\n
@@ -254,6 +211,47 @@ def From_drill_to_assembly(Offset1: int) -> None:
             robot.MoveL(RDK.Item("AboveAssemblyBottomCoverOffset"))
     Offset1 = 0
 
+def PCB_pickup() -> None:
+    """Picks up the PCB.\n
+    Parameters: None"""
+    robot.setPoseFrame(RDK.Item("FramePCB"))
+    robot.MoveL(RDK.Item("PCB 1"))
+    robot.MoveL(RDK.Item("PCB 2"))
+    Grasp(52, gripSpeed)
+    robot.MoveL(RDK.Item("PCB 1"))
+
+def Fuse_pickup(top_fuse: bool, bottom_fuse: bool) -> None:
+    """Picks up the the ordered amount of fuses depending on values top_fuse and bottom_fuse.\n
+    Parameters: (top_fuse: bool, bottom_fuse: bool)"""
+    robot.setPoseFrame(RDK.Item("Universal Frame"))
+    robot.MoveL(RDK.Item("BetweenFuseAndAssembly"))
+    if top_fuse and bottom_fuse: # Picks up both fuses
+        robot.setPoseFrame(RDK.Item("FrameFuse"))
+        robot.MoveL(RDK.Item("Top Fuse Approach & Exit"))
+        robot.setSpeed(200)
+        robot.MoveL(RDK.Item("Top Fuse"))
+        #pickup <----
+        robot.MoveL(RDK.Item("Top Fuse Approach & Exit"))
+        robot.MoveL(RDK.Item("Bottom Fuse Approach & Exit"))
+        robot.MoveL(RDK.Item("Bottom Fuse"))
+        #pickup <----
+        robot.MoveL(RDK.Item("Bottom Fuse Approach & Exit"))
+    elif top_fuse: # Picks up top fuse
+        robot.setPoseFrame(RDK.Item("FrameFuse"))
+        robot.MoveL(RDK.Item("Top Fuse Approach & Exit"))
+        robot.setSpeed(200)
+        robot.MoveL(RDK.Item("Top Fuse"))
+        #pickup <----
+        robot.MoveL(RDK.Item("Top Fuse Approach & Exit"))
+    elif bottom_fuse: # Picks up bottom fuse
+        robot.setPoseFrame(RDK.Item("FrameFuse"))
+        robot.MoveL(RDK.Item("Bottom Fuse Approach & Exit"))
+        robot.setSpeed(200)
+        robot.MoveL(RDK.Item("Bottom Fuse"))
+        #pickup <----
+        robot.MoveL(RDK.Item("Bottom Fuse Approach & Exit"))
+    robot.setSpeed(linear_speed)
+
 def From_fuse_to_assembly(top_fuse: bool, bottom_fuse: bool) -> None:
     """Takes the path from fuse to assembly depended on the values top_fuse and bottom_fuse.\n
     Parameters: (top_fuse: bool, bottom_fuse: bool)"""
@@ -264,6 +262,31 @@ def From_fuse_to_assembly(top_fuse: bool, bottom_fuse: bool) -> None:
     robot.MoveL(RDK.Item("AssemblyPCB"))
     Release(80, gripSpeed)
     robot.MoveL(RDK.Item("AboveAssemblyPCB"))
+
+def Top_pickup(Top: str) -> None:
+    """Picks up the top cover, depending on the ordered color input in the GUI.\n
+    Parameters: (Top: str)"""
+    robot.setPoseFrame(RDK.Item("Universal frame"))
+    robot.MoveJ(RDK.Item("BetweenTopCoverAndAssembly"))
+    match Top:
+        case 'White':
+            robot.setPoseFrame(RDK.Item("Frame 8"))
+            robot.MoveL(RDK.Item("Bottom Cover 1"))
+            robot.MoveL(RDK.Item("Bottom Cover 2"))
+            Grasp(68, gripSpeed)
+            robot.MoveL(RDK.Item("Bottom Cover 1"))
+        case 'Blue':
+            robot.setPoseFrame(RDK.Item("Frame 7"))
+            robot.MoveL(RDK.Item("Bottom Cover 1"))
+            robot.MoveL(RDK.Item("Bottom Cover 2"))
+            Grasp(68, gripSpeed)
+            robot.MoveL(RDK.Item("Bottom Cover 1"))
+        case 'Black':
+            robot.setPoseFrame(RDK.Item("Frame 6"))
+            robot.MoveL(RDK.Item("Bottom Cover 1"))
+            robot.MoveL(RDK.Item("Bottom Cover 2"))
+            Grasp(68, gripSpeed)
+            robot.MoveL(RDK.Item("Bottom Cover 1"))
 
 def From_top_cover_to_assembly() -> None:
     """Takes the path from top cover to assembly.\n
@@ -282,29 +305,3 @@ def Layoff_assembled_phone() -> None:
     Release(80, gripSpeed)
     robot.MoveJ(RDK.Item("AboveAssembledPhone"))
 
-def Move_home() -> None:
-    """Moves to starting position above assembly station.\n
-    Parameters: None"""
-    robot.MoveJ(RDK.Item("AboveAssemblyBottomCover"))
-
-def Grasp(width: int, speed: int) -> None:
-    """Uses grasp function from wsg50 library.\n
-    Parameters: (width: int, speed: int)"""
-    time.sleep(0.01)
-    wsg50_instance.grasp_part(width, speed)
-    time.sleep(0.01)
-
-def Release(width: int, speed: int):
-    """Uses release function from wsg50 library.\n
-    Parameters: (width: int, speed: int)"""
-    time.sleep(0.01)
-    wsg50_instance.release_part(width, speed)
-    time.sleep(0.01)
-
-def Initialize_robot(linear_speed: int, joint_speed: int) -> None:
-    """Start the UR5 in mode: '6'. This will make it possible to move the real robot from the PC (PC is the client, the robot behaves like a server). \n 
-    Then sets linear speed and joint speed of the UR5.\n
-    Parameters: (linear_speed, joint_speed)"""
-    RDK.setRunMode(6)
-    robot.setSpeed(linear_speed)
-    robot.setSpeedJoints(joint_speed)
