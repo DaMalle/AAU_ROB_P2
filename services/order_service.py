@@ -304,4 +304,3 @@ def Layoff_assembled_phone() -> None:
     robot.MoveJ(RDK.Item("AssembledPhoneLayoff"))
     Release(80, gripSpeed)
     robot.MoveJ(RDK.Item("AboveAssembledPhone"))
-
