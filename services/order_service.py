@@ -175,7 +175,7 @@ def Fuse_pickup(top_fuse: bool, bottom_fuse: bool): #Route dependend on amount a
         robot.MoveL(RDK.Item("Bottom Fuse Approach & Exit"))
     robot.setSpeed(robotspeed)
 
-def Top_pickup(Top: str) -> None: #Route dependend on cover color
+def Top_pickup(Top: str) -> None: # Route dependend on cover color
     """Picks up the bottom cover, depending on the Bottom number input, comming from the GUI"""
     robot.setPoseFrame(RDK.Item("Universal frame"))
     robot.MoveJ(RDK.Item("BetweenTopCoverAndAssembly"))
