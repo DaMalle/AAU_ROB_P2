@@ -34,6 +34,26 @@ class Order(BaseModel):
     top_hole: bool
     bottom_hole: bool
 
+top_dict = {
+    'Black': 6,
+    'Blue': 5,
+    'White': 4
+}
+
+bottom_dict = {
+    'Black': 3,
+    'Blue': 2,
+    'White': 1
+}
+
+# top_dict[order.top_color] = 6
+
+# Variables to adjust different speeds
+linear_speed = 500
+joint_speed = 100
+drillTime = 0.5
+gripSpeed = 400
+RDK.setSimulationSpeed(5)
 
 app = FastAPI()
 origins = [
@@ -61,41 +81,42 @@ def read_order(order: Order) -> str:
     bottom_fuse = order.bottom_fuse
     top_holes = order.top_hole
     bottom_holes = order.bottom_hole
-    
-    #Main program
-    Initialize_robot()
-    wsg50_instance.preposition_gripper(90, gripSpeed) 
-    Move_home()
-    Bottom_pickup(Bottom)
-    Offset1 = Hole_drill(top_holes, bottom_holes)
-    From_drill_to_assembly(Offset1)
-    PCB_pickup()
-    Fuse_pickup(top_fuse, bottom_fuse)
-    From_fuse_to_assembly(top_fuse, bottom_fuse)
-    Top_pickup(Top)
-    From_top_cover_to_assembly()
-    Layoff_assembled_phone()
-    Move_home()
-    return {"Status": "success"}
 
-# Variables to adjust different speeds
-linear_speed = 1500
-joint_speed = 190
-drillTime = 0.5
-gripSpeed = 400
-RDK.setSimulationSpeed(5)
+    stock_list = Check_stock(top_dict[Top],bottom_dict[Bottom])
+
+    if (stock_list[0] and stock_list[1] and stock_list[2]):
+        print("Items in stock")
+        Initialize_robot(linear_speed, joint_speed)
+        wsg50_instance.preposition_gripper(90, gripSpeed)
+        Move_home()
+        Bottom_pickup(Bottom)
+        Offset1 = Hole_drill(top_holes, bottom_holes)
+        From_drill_to_assembly(Offset1)
+        PCB_pickup()
+        Fuse_pickup(top_fuse, bottom_fuse)
+        From_fuse_to_assembly(top_fuse, bottom_fuse)
+        Top_pickup(Top)
+        From_top_cover_to_assembly()
+        Layoff_assembled_phone()
+        Move_home()
+    else:
+        print("Items not in stock")
+    
 
 # Fixture code (Missing implementation)
 def Check_stock(Top, Bottom) -> list[int]:
     HOST = "192.168.1.184"
     PORT = 502
     with ModbusTcpClient(host=HOST, port=PORT) as client:
+
         client.connect()
         resultTop = client.read_holding_registers(address=Top, count=2, slave=255)
         print(resultTop.registers[0])
         resultBottom = client.read_holding_registers(address=Bottom, count=2, slave=255)
         print(resultBottom.registers[0])
-        return [resultTop.registers[0], resultBottom.registers[0]]
+        resultPCB = client.read_holding_registers(address=0, count=2, slave=255)
+        print(resultPCB.registers[0])
+        return [resultTop.registers[0], resultBottom.registers[0], resultPCB.registers[0]]
 
 ### -------- Functions for moving the UR5 -------- ###
 def Initialize_robot(linear_speed: int, joint_speed: int) -> None:
@@ -288,3 +309,4 @@ def Layoff_assembled_phone() -> None:
     robot.MoveJ(RDK.Item("AssembledPhoneLayoff"))
     Release(80, gripSpeed)
     robot.MoveJ(RDK.Item("AboveAssembledPhone"))
+
