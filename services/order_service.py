@@ -131,22 +131,14 @@ def Bottom_pickup(Bottom: str) -> None:
     match Bottom:
         case 'White':
             robot.setPoseFrame(RDK.Item("Frame 5"))
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
-            robot.MoveL(RDK.Item("Bottom Cover 2"))
-            Grasp(68, gripSpeed)
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
         case 'Blue':
             robot.setPoseFrame(RDK.Item("Frame 4"))
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
-            robot.MoveL(RDK.Item("Bottom Cover 2"))
-            Grasp(68, gripSpeed)
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
         case 'Black':
             robot.setPoseFrame(RDK.Item("Frame 3"))
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
-            robot.MoveL(RDK.Item("Bottom Cover 2"))
-            Grasp(68, gripSpeed)
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
+    robot.MoveL(RDK.Item("Bottom Cover 1"))
+    robot.MoveL(RDK.Item("Bottom Cover 2"))
+    Grasp(68, gripSpeed)
+    robot.MoveL(RDK.Item("Bottom Cover 1"))
 
 def Hole_drill(top_holes: bool, bottom_holes: bool) -> int:
     """Drills the correct amount of holes in the bottom cover depended on values top_holes and bottom_holes\n
@@ -271,22 +263,14 @@ def Top_pickup(Top: str) -> None:
     match Top:
         case 'White':
             robot.setPoseFrame(RDK.Item("Frame 8"))
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
-            robot.MoveL(RDK.Item("Bottom Cover 2"))
-            Grasp(68, gripSpeed)
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
         case 'Blue':
             robot.setPoseFrame(RDK.Item("Frame 7"))
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
-            robot.MoveL(RDK.Item("Bottom Cover 2"))
-            Grasp(68, gripSpeed)
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
         case 'Black':
             robot.setPoseFrame(RDK.Item("Frame 6"))
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
-            robot.MoveL(RDK.Item("Bottom Cover 2"))
-            Grasp(68, gripSpeed)
-            robot.MoveL(RDK.Item("Bottom Cover 1"))
+    robot.MoveL(RDK.Item("Bottom Cover 1"))
+    robot.MoveL(RDK.Item("Bottom Cover 2"))
+    Grasp(68, gripSpeed)
+    robot.MoveL(RDK.Item("Bottom Cover 1"))
 
 def From_top_cover_to_assembly() -> None:
     """Takes the path from top cover to assembly.\n
