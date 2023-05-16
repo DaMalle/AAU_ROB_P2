@@ -72,36 +72,38 @@ app.add_middleware(
 
 
 @app.post("/")
-def read_order(order: Order) -> str:
+def read_order() -> str:
     '''Waits for an order to be made in the GUI and assembles order if possible.
     
     Parameters: (order: Class)'''
-    Top = order.top_color
-    Bottom = order.bottom_color
-    top_fuse = order.top_fuse
-    bottom_fuse = order.bottom_fuse
-    top_holes = order.top_hole
-    bottom_holes = order.bottom_hole
+    Top = ['Black', 'Blue', 'White', 'Blue', 'Black', 'Blue', 'White', 'Blue', 'Black', 'Blue', 'Black', 'Blue', 'White', 'Blue', 'Black', 'Blue', 'White', 'Blue', 'Black', 'Blue', 'Black', 'Blue', 'White', 'Blue', 'Black', 'Blue', 'White', 'Blue', 'Black', 'Blue']
+    Bottom = Top
+    top_fuse = True
+    bottom_fuse = True
+    top_holes = True
+    bottom_holes = True
     Offset1 = 0
-    stock_list = Check_stock(top_dict[Top],bottom_dict[Bottom])
+    
 
-    if (stock_list[0] and stock_list[1] and stock_list[2]):
-        print("Items in stock")
-        Initialize_robot(linear_speed, joint_speed)
-        wsg50_instance.preposition_gripper(90, gripSpeed)
-        Move_home()
-        Bottom_pickup(Bottom)
-        Offset1 = Hole_drill(top_holes, bottom_holes)
-        From_drill_to_assembly(Offset1)
-        PCB_pickup()
-        Fuse_pickup(top_fuse, bottom_fuse)
-        From_fuse_to_assembly(top_fuse, bottom_fuse)
-        Top_pickup(Top)
-        From_top_cover_to_assembly()
-        Layoff_assembled_phone()
-        Move_home()
-    else:
-        print("Items not in stock")
+    for i in range(len(Top)):
+        stock_list = Check_stock(top_dict[Top[i]],bottom_dict[Bottom[i]])
+        if (stock_list[0] and stock_list[1] and stock_list[2]):
+            print("Items in stock")
+            Initialize_robot(linear_speed, joint_speed)
+            wsg50_instance.preposition_gripper(90, gripSpeed)
+            Move_home()
+            Bottom_pickup(Bottom[i])
+            Offset1 = Hole_drill(top_holes, bottom_holes)
+            From_drill_to_assembly(Offset1)
+            PCB_pickup()
+            Fuse_pickup(top_fuse, bottom_fuse)
+            From_fuse_to_assembly(top_fuse, bottom_fuse)
+            Top_pickup(Top[i])
+            From_top_cover_to_assembly()
+            Layoff_assembled_phone()
+            Move_home()
+        else:
+            print("Items not in stock")
     
 
 # Fixture code (Missing implementation)
@@ -333,3 +335,4 @@ def Layoff_assembled_phone() -> None:
     robot.MoveJ(RDK.Item("AboveAssembledPhone"))
 
 
+read_order()
