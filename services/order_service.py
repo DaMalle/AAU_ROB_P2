@@ -119,6 +119,14 @@ def Check_stock(Top, Bottom) -> list[int]:
         print(resultPCB.registers[0])
         return [resultTop.registers[0], resultBottom.registers[0], resultPCB.registers[0]]
 
+# LED Function
+def Drill_LED(LED_DRILL):
+    HOST = "192.168.1.184"
+    PORT = 502
+    with ModbusTcpClient(host=HOST, port=PORT) as client:
+        client.connect()
+        client.write_register(address=7, value=LED_DRILL, slave=255)
+
 ### -------- Functions for moving the UR5 -------- ###
 def Initialize_robot(linear_speed: int, joint_speed: int) -> None:
     """Start the UR5 in mode: '6'. This will make it possible to move the real robot from the PC (PC is the client, the robot behaves like a server). \n 
@@ -172,7 +180,9 @@ def Hole_drill(top_holes: bool, bottom_holes: bool) -> int:
         robot.MoveL(RDK.Item("Approach_Exit_Drilling"))
         robot.MoveL(RDK.Item("BeforeDrilling"))
         robot.MoveL(RDK.Item("Drilling"))
+        Drill_LED(1)
         time.sleep(drillTime)
+        Drill_LED(0)
         robot.MoveL(RDK.Item("BeforeDrilling"))
         robot.MoveJ(RDK.Item("AboveBottomCover180"))
         robot.MoveL(RDK.Item("DetachBottomCover180"))
@@ -181,7 +191,9 @@ def Hole_drill(top_holes: bool, bottom_holes: bool) -> int:
         Grasp(69, gripSpeed)
         robot.MoveJ(RDK.Item("AboveBottomCover180"))
         robot.MoveL(RDK.Item("Drilling180"))
+        Drill_LED(1)
         time.sleep(drillTime)
+        Drill_LED(0)
         robot.MoveL(RDK.Item("BeforeDrilling180"))
         robot.MoveJ(RDK.Item("Approach_Exit_Drilling"))
         return 1
@@ -190,7 +202,9 @@ def Hole_drill(top_holes: bool, bottom_holes: bool) -> int:
         robot.MoveL(RDK.Item("Approach_Exit_Drilling"))
         robot.MoveL(RDK.Item("BeforeDrilling"))
         robot.MoveL(RDK.Item("Drilling"))
+        Drill_LED(1)
         time.sleep(drillTime)
+        Drill_LED(0)
         robot.MoveL(RDK.Item("BeforeDrilling"))
         robot.MoveL(RDK.Item("Approach_Exit_Drilling"))
         return 0
@@ -204,7 +218,9 @@ def Hole_drill(top_holes: bool, bottom_holes: bool) -> int:
         robot.MoveJ(RDK.Item("AboveBottomCover180"))
         robot.MoveL(RDK.Item("BeforeDrilling180"))
         robot.MoveL(RDK.Item("Drilling180"))
+        Drill_LED(1)
         time.sleep(drillTime)
+        Drill_LED(0)
         robot.MoveL(RDK.Item("BeforeDrilling180"))
         robot.MoveJ(RDK.Item("Approach_Exit_Drilling"))
         return 1    
