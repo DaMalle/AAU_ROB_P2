@@ -72,36 +72,38 @@ app.add_middleware(
 
 
 @app.post("/")
-def read_order(order: Order) -> str:
+def read_order() -> str:
     '''Waits for an order to be made in the GUI and assembles order if possible.
     
     Parameters: (order: Class)'''
-    Top = order.top_color
-    Bottom = order.bottom_color
-    top_fuse = order.top_fuse
-    bottom_fuse = order.bottom_fuse
-    top_holes = order.top_hole
-    bottom_holes = order.bottom_hole
+    Top = ['Black', 'Blue', 'White', 'Blue', 'Black', 'Blue', 'White', 'Blue', 'Black', 'Blue', 'Black', 'Blue', 'White', 'Blue', 'Black', 'Blue', 'White', 'Blue', 'Black', 'Blue', 'Black', 'Blue', 'White', 'Blue', 'Black', 'Blue', 'White', 'Blue', 'Black', 'Blue']
+    Bottom = Top
+    top_fuse = True
+    bottom_fuse = True
+    top_holes = True
+    bottom_holes = True
     Offset1 = 0
-    stock_list = Check_stock(top_dict[Top],bottom_dict[Bottom])
+    
 
-    if (stock_list[0] and stock_list[1] and stock_list[2]):
-        print("Items in stock")
-        Initialize_robot(linear_speed, joint_speed)
-        wsg50_instance.preposition_gripper(90, gripSpeed)
-        Move_home()
-        Bottom_pickup(Bottom)
-        Offset1 = Hole_drill(top_holes, bottom_holes)
-        From_drill_to_assembly(Offset1)
-        PCB_pickup()
-        Fuse_pickup(top_fuse, bottom_fuse)
-        From_fuse_to_assembly(top_fuse, bottom_fuse)
-        Top_pickup(Top)
-        From_top_cover_to_assembly()
-        Layoff_assembled_phone()
-        Move_home()
-    else:
-        print("Items not in stock")
+    for i in range(len(Top)):
+        stock_list = Check_stock(top_dict[Top[i]],bottom_dict[Bottom[i]])
+        if (stock_list[0] and stock_list[1] and stock_list[2]):
+            print("Items in stock")
+            Initialize_robot(linear_speed, joint_speed)
+            wsg50_instance.preposition_gripper(90, gripSpeed)
+            Move_home()
+            Bottom_pickup(Bottom[i])
+            Offset1 = Hole_drill(top_holes, bottom_holes)
+            From_drill_to_assembly(Offset1)
+            PCB_pickup()
+            Fuse_pickup(top_fuse, bottom_fuse)
+            From_fuse_to_assembly(top_fuse, bottom_fuse)
+            Top_pickup(Top[i])
+            From_top_cover_to_assembly()
+            Layoff_assembled_phone()
+            Move_home()
+        else:
+            print("Items not in stock")
     
 
 # Fixture code (Missing implementation)
@@ -118,14 +120,6 @@ def Check_stock(Top, Bottom) -> list[int]:
         resultPCB = client.read_holding_registers(address=0, count=2, slave=255)
         print(resultPCB.registers[0])
         return [resultTop.registers[0], resultBottom.registers[0], resultPCB.registers[0]]
-
-# LED Function
-def Drill_LED(LED_DRILL):
-    HOST = "192.168.1.184"
-    PORT = 502
-    with ModbusTcpClient(host=HOST, port=PORT) as client:
-        client.connect()
-        client.write_register(address=7, value=LED_DRILL, slave=255)
 
 ### -------- Functions for moving the UR5 -------- ###
 def Initialize_robot(linear_speed: int, joint_speed: int) -> None:
@@ -180,9 +174,7 @@ def Hole_drill(top_holes: bool, bottom_holes: bool) -> int:
         robot.MoveL(RDK.Item("Approach_Exit_Drilling"))
         robot.MoveL(RDK.Item("BeforeDrilling"))
         robot.MoveL(RDK.Item("Drilling"))
-        Drill_LED(1)
         time.sleep(drillTime)
-        Drill_LED(0)
         robot.MoveL(RDK.Item("BeforeDrilling"))
         robot.MoveJ(RDK.Item("AboveBottomCover180"))
         robot.MoveL(RDK.Item("DetachBottomCover180"))
@@ -191,9 +183,7 @@ def Hole_drill(top_holes: bool, bottom_holes: bool) -> int:
         Grasp(69, gripSpeed)
         robot.MoveJ(RDK.Item("AboveBottomCover180"))
         robot.MoveL(RDK.Item("Drilling180"))
-        Drill_LED(1)
         time.sleep(drillTime)
-        Drill_LED(0)
         robot.MoveL(RDK.Item("BeforeDrilling180"))
         robot.MoveJ(RDK.Item("Approach_Exit_Drilling"))
         return 1
@@ -202,9 +192,7 @@ def Hole_drill(top_holes: bool, bottom_holes: bool) -> int:
         robot.MoveL(RDK.Item("Approach_Exit_Drilling"))
         robot.MoveL(RDK.Item("BeforeDrilling"))
         robot.MoveL(RDK.Item("Drilling"))
-        Drill_LED(1)
         time.sleep(drillTime)
-        Drill_LED(0)
         robot.MoveL(RDK.Item("BeforeDrilling"))
         robot.MoveL(RDK.Item("Approach_Exit_Drilling"))
         return 0
@@ -218,9 +206,7 @@ def Hole_drill(top_holes: bool, bottom_holes: bool) -> int:
         robot.MoveJ(RDK.Item("AboveBottomCover180"))
         robot.MoveL(RDK.Item("BeforeDrilling180"))
         robot.MoveL(RDK.Item("Drilling180"))
-        Drill_LED(1)
         time.sleep(drillTime)
-        Drill_LED(0)
         robot.MoveL(RDK.Item("BeforeDrilling180"))
         robot.MoveJ(RDK.Item("Approach_Exit_Drilling"))
         return 1    
@@ -349,3 +335,4 @@ def Layoff_assembled_phone() -> None:
     robot.MoveJ(RDK.Item("AboveAssembledPhone"))
 
 
+read_order()
